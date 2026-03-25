@@ -1,4 +1,5 @@
-from . import *
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, BigInteger, String, DateTime
 
 
 class Base(DeclarativeBase):

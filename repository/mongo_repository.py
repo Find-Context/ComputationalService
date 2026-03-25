@@ -1,34 +1,23 @@
-from datetime import datetime
-
 from repository.context.mongo_context import mongo
-from core import MessageTypes
+from models import Message
 
 
-async def insert_message(chat_id: int,
-                         message_id: int,
-                         type: MessageTypes,
-                         vector: list,
-                         text: str,
-                         has_document: bool = False,
-                         has_audio: bool = False,
-                         has_photo: bool = False,
-                         has_video: bool = False
-                         ):
+async def insert_message(message: Message):
+    # TODO: implement auto parsing of message and writing to database, maybe with some kind of decorator or something like that
     try:
         result = await mongo.get_database.get_collection("messages").insert_one(
             {
-                "chatId": chat_id,
-                "messageId": message_id,
-                "type": type.value,
-                "vector": vector,
-                "text": text,
-                "hasDocument": has_document,
-                "hasAudio": has_audio,
-                "hasPhoto": has_photo,
-                "hasVideo": has_video,
-                "createdAt": datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                "chatId": message.chat_id,
+                "messageId": message.message_id,
+                "type": message.type.value,
+                "vector": message.vector,
+                "text": message.text,
+                "hasDocument": message.has_document,
+                "hasAudio": message.has_audio,
+                "hasPhoto": message.has_photo,
+                "hasVideo": message.has_video,
+                "createdAt": message.created_at
             }
         )
-        return result
     except Exception as e:
         print(f"Error inserting message: {e}")

@@ -9,7 +9,7 @@ async def main() -> None:
 
 
 async def run_server() -> None:
-    config = Config(app="controllers.controller:app", host="0.0.0.0", port=17001, reload=False)
+    config = Config(app="controllers.messages:app", host="127.0.0.1", port=17001, reload=False)
     server = Server(config)
     await server.serve()
 
