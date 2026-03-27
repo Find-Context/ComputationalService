@@ -1,5 +1,5 @@
 import asyncio
-from uvicorn import Config, Server
+from uvicorn import Server, Config
 
 
 async def main() -> None:
@@ -9,7 +9,7 @@ async def main() -> None:
 
 
 async def run_server() -> None:
-    config = Config(app="controllers.messages:app", host="127.0.0.1", port=17001, reload=False)
+    config = Config(app="app.main:app", host="127.0.0.1", port=17001)
     server = Server(config)
     await server.serve()
 
