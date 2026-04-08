@@ -12,7 +12,6 @@ async def insert_message(message: Message):
     except DuplicateKeyError as e:
         print(f"Duplicate key error: {e}")
         raise e
-    # TODO: handle other exceptions, maybe with some kind of custom exception class or something like that
     except Exception as e:
         print(f"Error inserting message: {e}")
         return
