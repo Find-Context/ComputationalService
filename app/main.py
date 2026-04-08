@@ -1,11 +1,7 @@
 from fastapi import FastAPI
-from routes import api_router
+from .routes import message_router
+from middleware import message_exception_handler
 
 app = FastAPI()
-
-app.add_middleware(
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)#TODO: implement cors middleware
-app.include_router(api_router)
+app.middleware("http")(message_exception_handler)
+app.include_router(message_router)

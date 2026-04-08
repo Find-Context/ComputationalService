@@ -5,7 +5,6 @@ from models import Message
 
 
 async def insert_message(message: Message):
-    # TODO: implement auto parsing of message and writing to database, maybe with some kind of decorator or something like that
     try:
         await mongo.get_database.get_collection("messages").insert_one(
             message.model_dump(mode='json')
