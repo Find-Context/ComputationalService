@@ -1,34 +1,18 @@
-from datetime import datetime
+from pymongo.errors import DuplicateKeyError
 
 from repository.context.mongo_context import mongo
-from core import MessageTypes
+from models import Message
 
 
-async def insert_message(chat_id: int,
-                         message_id: int,
-                         type: MessageTypes,
-                         vector: list,
-                         text: str,
-                         has_document: bool = False,
-                         has_audio: bool = False,
-                         has_photo: bool = False,
-                         has_video: bool = False
-                         ):
+async def insert_message(message: Message):
     try:
-        result = await mongo.get_database.get_collection("messages").insert_one(
-            {
-                "chatId": chat_id,
-                "messageId": message_id,
-                "type": type.value,
-                "vector": vector,
-                "text": text,
-                "hasDocument": has_document,
-                "hasAudio": has_audio,
-                "hasPhoto": has_photo,
-                "hasVideo": has_video,
-                "createdAt": datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            }
+        await mongo.get_database.get_collection("messages").insert_one(
+            message.model_dump(mode='json')
         )
-        return result
+    except DuplicateKeyError as e:
+        print(f"Duplicate key error: {e}")
+        raise e
+    # TODO: handle other exceptions, maybe with some kind of custom exception class or something like that
     except Exception as e:
         print(f"Error inserting message: {e}")
+        return

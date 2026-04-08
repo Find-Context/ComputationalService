@@ -1,4 +1,5 @@
 from core import settings
+from core.exceptions.database_connection_error import DatabaseConnectionError
 from . import Singleton
 
 from pymongo import AsyncMongoClient
@@ -17,7 +18,7 @@ class Mongo(metaclass=Singleton):
             self._client = AsyncMongoClient(connection)
         except Exception as e:
             print(f"Error connecting to MongoDB")
-            raise e
+            raise DatabaseConnectionError(f"Error connecting to MongoDB: {e}")
         self._database = self._client.get_database(settings.mongo_db)
 
     @property
