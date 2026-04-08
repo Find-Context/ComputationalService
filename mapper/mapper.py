@@ -1,4 +1,4 @@
-from models import MessageDTO, Message
+from models import MessageDTO, UsersDTO, ChatsDTO, Message, Users, Chats
 from core import MessageTypes
 
 
@@ -19,3 +19,25 @@ def map_message_dto_to_dao(message_dto: MessageDTO) -> Message:
     )
 
     return message_dao
+
+
+def map_users_dto_to_dao(users_dto: UsersDTO) -> Users:
+    user_dao = Users(
+        telegram_id=users_dto.telegram_id,
+        username=users_dto.username,
+        first_name=users_dto.first_name,
+        last_name=users_dto.last_name,
+        registered_at=users_dto.registered_at
+    )
+
+    return user_dao
+
+
+def map_chats_dto_to_dao(chats_dto: ChatsDTO) -> Chats:
+    chat_dao = Chats(
+        telegram_chat_id=chats_dto.telegram_chat_id,
+        title=chats_dto.title,
+        created_at=chats_dto.created_at
+    )
+
+    return chat_dao
