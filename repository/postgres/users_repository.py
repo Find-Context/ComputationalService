@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, DataError
 
 from core.exceptions.entity_error import DuplicatedPrimaryKeyError
 from ..context import _postgres_context
@@ -16,10 +16,15 @@ async def create_new_user(new_user: Users):
 
             return new_user
         except IntegrityError as e:
+            print(f"Duplicated primary keys while creating new user: {e}")
             await session.rollback()
-            print(f"Error creating user: {e}")
-            raise DuplicatedPrimaryKeyError(f"User already exists.")
+            raise DuplicatedPrimaryKeyError(str(e))
+        except DataError as e:
+            print(f"Data error while creating new user: {e}")
+            await session.rollback()
+            raise e
         except Exception as e:
+            await session.rollback()
             print(f"Error creating user: {e}")
             raise e
 
@@ -55,6 +60,11 @@ async def create_user_chat_connection(user_id: int, chat_id: int):
             await session.rollback()
             print(f"Error creating user-chat connection: {e}")
             raise DuplicatedPrimaryKeyError(f"Connection between user {user_id} and chat {chat_id} already exists.")
+        except DataError as e:
+            print(f"Data error while creating new user: {e}")
+            await session.rollback()
+            raise e
         except Exception as e:
+            await session.rollback()
             print(f"Error creating user-chat connection: {e}")
             raise e

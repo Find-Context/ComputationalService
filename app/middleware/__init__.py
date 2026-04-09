@@ -1,1 +1,1 @@
-from mongo_middleware import message_exception_handler
+from .exception_middleware import GlobalExceptionMiddleware
