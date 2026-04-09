@@ -26,4 +26,4 @@ class Postgres(metaclass=Singleton):
         return self._sessionmaker()
 
 
-postgres = Postgres()
+_postgres_context = Postgres()

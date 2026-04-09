@@ -11,7 +11,7 @@ router = APIRouter(prefix="/chats", tags=["chats"])
 async def insert_chat(chat_dto: ChatsDTO, response: Response):
     try:
         dao = map_chats_dto_to_dao(chat_dto)
-        await postgres.insert_chat(dao)
+        await postgres.create_chat(dao)
     except Exception as e:
         print(f"Error inserting chat: {e}")
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
