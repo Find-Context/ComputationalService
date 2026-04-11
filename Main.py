@@ -9,7 +9,7 @@ async def main() -> None:
 
 
 async def run_server() -> None:
-    config = Config(app="app.main:app", host="127.0.0.1", port=17001)
+    config = Config(app="api.main:app", host="127.0.0.1", port=17001)
     server = Server(config)
     await server.serve()
 

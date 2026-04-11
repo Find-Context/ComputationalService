@@ -2,11 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, DataError
 
 from core.exceptions.entity_error import DuplicatedPrimaryKeyError
-from models import UsersChats
+from domain.models import UsersChats
 
-from repository.abstractions import AbstractRepository
-
-from mapper import map_users_dto_to_dao
+from infrastructure.repository.abstractions import AbstractRepository
 
 
 class UsersChatsRepository(AbstractRepository):
@@ -16,7 +14,7 @@ class UsersChatsRepository(AbstractRepository):
     async def create(self, user_id: int, chat_id: int):
         try:
             users_chats = UsersChats(user_id=user_id, chat_id=chat_id)
-            await self._context.get_session.add(users_chats)
+            self._context.get_session.add(users_chats)
             await self._context.get_session.flush()
 
             return users_chats

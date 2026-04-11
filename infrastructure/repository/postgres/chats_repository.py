@@ -2,9 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, DataError
 
 from core.exceptions import DuplicatedPrimaryKeyError
-from models import Chats, ChatsDTO
+from domain.models import Chats, ChatsDTO
 
-from repository.abstractions import AbstractRepository
+from infrastructure.repository.abstractions import AbstractRepository
 
 from mapper import map_chats_dto_to_dao
 
@@ -16,10 +16,10 @@ class ChatsRepository(AbstractRepository):
     async def create(self, entity: ChatsDTO):
         try:
             mapped_entity = map_chats_dto_to_dao(entity)
-            await self._context.get_session.add(mapped_entity)
+            self._context.get_session.add(mapped_entity)
             await self._context.get_session.flush()
 
-            return entity
+            return mapped_entity
         except IntegrityError as e:
             print(f"Duplicated primary keys while creating new chat: {e}")
             raise DuplicatedPrimaryKeyError(str(e))
@@ -47,7 +47,7 @@ class ChatsRepository(AbstractRepository):
 
     async def update(self, entity: ChatsDTO):
         try:
-            return await self._context.get_session.merge(map_chats_dto_to_dao(entity))
+            return self._context.get_session.merge(map_chats_dto_to_dao(entity))
         except DataError as e:
             print(f"Data error while updating chat: {e}")
             raise e

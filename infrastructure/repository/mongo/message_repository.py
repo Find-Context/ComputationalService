@@ -1,9 +1,10 @@
 from pymongo.errors import DuplicateKeyError
 
-from repository.context.mongo_context import mongo
-from models import Message, MessageDTO
+from core.exceptions import DuplicatedPrimaryKeyError
+from infrastructure.repository.context.mongo_context import _mongo_context
+from domain.models import Message, MessageDTO
 
-from repository.abstractions import AbstractRepository
+from infrastructure.repository.abstractions import AbstractRepository
 
 from mapper import map_message_dto_to_dao
 
@@ -14,15 +15,15 @@ class MessageRepository(AbstractRepository):
 
     async def create(self, entity: MessageDTO):
         try:
-            await mongo.get_database.get_collection("messages").insert_one(
+            await self._context.get_database.get_collection("messages").insert_one(
                 map_message_dto_to_dao(entity).model_dump(mode='json')
             )
         except DuplicateKeyError as e:
             print(f"Duplicate key error: {e}")
-            raise e
+            raise DuplicatedPrimaryKeyError(str(e))
         except Exception as e:
             print(f"Error inserting message: {e}")
-            return
+            raise e
 
     async def get_by_id(self, id: int):
         try:
@@ -39,7 +40,7 @@ class MessageRepository(AbstractRepository):
 
     async def delete(self, id: int):
         try:
-            result = await mongo.get_database.get_collection("messages").delete_one({"id": id})
+            result = await self._context.get_database.get_collection("messages").delete_one({"_id": id})
             return result.deleted_count > 0
         except Exception as e:
             print(f"Error deleting message: {e}")
