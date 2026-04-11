@@ -1,4 +1,4 @@
-from models import MessageDTO, UsersDTO, ChatsDTO, Message, Users, Chats
+from domain.models import MessageDTO, UsersDTO, ChatsDTO, Message, Users, Chats
 from core import MessageTypes
 
 

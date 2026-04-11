@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api import messages, users, chats
+from api.controller import users, messages, chats
 
 api_router = APIRouter()
 api_router.include_router(messages.router)

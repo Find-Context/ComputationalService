@@ -29,4 +29,4 @@ class Mongo(metaclass=Singleton):
         self._client.close()
 
 
-mongo = Mongo()
+_mongo_context = Mongo()

@@ -22,6 +22,7 @@ class Postgres(metaclass=Singleton):
 
         self._sessionmaker = async_sessionmaker(self._engine)
 
+    @property
     def get_session(self):
         return self._sessionmaker()
 
