@@ -1,2 +1,3 @@
-from .chats_repository import *
-from .users_repository import *
+from .chats_repository import ChatsRepository
+from .users_chats_repository import UsersChatsRepository
+from .users_repository import UsersRepository
