@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, DataError
 
+from core.exceptions import NoContentError
 from core.exceptions.entity_error import DuplicatedPrimaryKeyError
 from domain.models import Users, UsersDTO
 
@@ -10,14 +11,14 @@ from mapper import map_users_dto_to_dao
 
 
 class UsersRepository(AbstractRepository):
-    def __init__(self, context):
-        self._context = context
+    def __init__(self, session):
+        self._session = session
 
     async def create(self, entity: UsersDTO):
         try:
             mapped_entity = map_users_dto_to_dao(entity)
-            self._context.get_session.add(mapped_entity)
-            await self._context.get_session.flush()
+            self._session.add(mapped_entity)
+            await self._session.flush()
 
             return mapped_entity
         except IntegrityError as e:
@@ -32,14 +33,17 @@ class UsersRepository(AbstractRepository):
 
     async def get_by_id(self, id: int):
         try:
-            return await self._context.get_session.get(Users, id)
+            user = await self._session.get(Users, id)
+            if user:
+                return user
+            raise NoContentError(f"No user found with id: {id}")
         except Exception as e:
             print(f"Error retrieving user: {e}")
             raise e
 
     async def get_all(self):
         try:
-            result = await self._context.get_session.execute(select(Users))
+            result = await self._session.execute(select(Users))
             return result.all()
         except Exception as e:
             print(f"Error retrieving users: {e}")
@@ -47,7 +51,7 @@ class UsersRepository(AbstractRepository):
 
     async def update(self, entity: UsersDTO):
         try:
-            return self._context.get_session.merge(map_users_dto_to_dao(entity))
+            return self._session.merge(map_users_dto_to_dao(entity))
         except DataError as e:
             print(f"Data error while updating user: {e}")
             raise e
@@ -57,9 +61,9 @@ class UsersRepository(AbstractRepository):
 
     async def delete(self, id: int):
         try:
-            user = await self._context.get_session.get(Users, id)
+            user = await self._session.get(Users, id)
             if user:
-                await self._context.get_session.delete(user)
+                await self._session.delete(user)
                 return True
             raise DataError
         except Exception as e:

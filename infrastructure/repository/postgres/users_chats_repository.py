@@ -8,14 +8,14 @@ from infrastructure.repository.abstractions import AbstractRepository
 
 
 class UsersChatsRepository(AbstractRepository):
-    def __init__(self, context):
-        self._context = context
+    def __init__(self, session):
+        self._session = session
 
     async def create(self, user_id: int, chat_id: int):
         try:
             users_chats = UsersChats(user_id=user_id, chat_id=chat_id)
-            self._context.get_session.add(users_chats)
-            await self._context.get_session.flush()
+            self._session.add(users_chats)
+            await self._session.flush()
 
             return users_chats
         except IntegrityError as e:
@@ -33,7 +33,7 @@ class UsersChatsRepository(AbstractRepository):
 
     async def get_all(self):
         try:
-            result = await self._context.get_session.execute(select(UsersChats))
+            result = await self._session.execute(select(UsersChats))
             return result.all()
         except Exception as e:
             print(f"Error retrieving user - chat connection: {e}")
@@ -45,9 +45,9 @@ class UsersChatsRepository(AbstractRepository):
     async def delete(self, user_id: int, chat_id: int):
         try:
             users_chats = UsersChats(user_id=user_id, chat_id=chat_id)
-            entity = await self._context.get_session.get(users_chats)
+            entity = await self._session.get(users_chats)
             if entity:
-                await self._context.get_session.delete(entity)
+                await self._session.delete(entity)
                 return True
             raise DataError
         except Exception as e:

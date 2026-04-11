@@ -4,27 +4,48 @@ from infrastructure.repository.context import _postgres_context, _mongo_context
 
 
 async def get_user_service():
-    user_repo = UsersRepository(_postgres_context)
+    async with _postgres_context.get_session as session:
+        user_repo = UsersRepository(session)
 
-    yield UsersService(user_repo)
-    await _postgres_context.get_session.commit()
+        try:
+            yield UsersService(user_repo)
+            await session.commit()
+        except Exception as e:
+            print(f"Error in user service dependency: {e}")
+            await session.rollback()
+            raise e
 
 
 async def get_chat_service():
-    chat_repo = ChatsRepository(_postgres_context)
+    async with _postgres_context.get_session as session:
+        chat_repo = ChatsRepository(session)
 
-    yield ChatsService(chat_repo)
-    await _postgres_context.get_session.commit()
+        try:
+            yield ChatsService(chat_repo)
+            await session.commit()
+        except Exception as e:
+            print(f"Error in chat service dependency: {e}")
+            await session.rollback()
+            raise e
 
 
 async def get_users_chats_service():
-    users_chats_repo = UsersChatsRepository(_postgres_context)
+    async with _postgres_context.get_session as session:
+        users_chats_repo = UsersChatsRepository(session)
 
-    yield UsersChatsService(users_chats_repo)
-    await _postgres_context.get_session.commit()
+        try:
+            yield UsersChatsService(users_chats_repo)
+            await session.commit()
+        except Exception as e:
+            print(f"Error in users-chats service dependency: {e}")
+            await session.rollback()
+            raise e
 
 
 async def get_message_service():
     mongo_repo = MessageRepository(_mongo_context)
-
-    yield MessageService(mongo_repo)
+    try:
+        yield MessageService(mongo_repo)
+    except Exception as e:
+        print(f"Error in message service dependency: {e}")
+        raise e

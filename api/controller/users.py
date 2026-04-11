@@ -20,5 +20,5 @@ async def get_user(user_id: int, service=Depends(get_user_service)):
 
 @router.post("/{user_id}/chats/{chat_id}", status_code=status.HTTP_201_CREATED)
 async def create_user_chat_connection(user_id: int, chat_id: int, service=Depends(get_users_chats_service)):
-    await service.create_user_chat_connection(user_id, chat_id)
+    await service.create_user_chat(user_id, chat_id)
     return {"message": "Chat connection created successfully"}

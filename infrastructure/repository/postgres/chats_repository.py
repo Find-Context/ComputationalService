@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, DataError
 
-from core.exceptions import DuplicatedPrimaryKeyError
+from core.exceptions import DuplicatedPrimaryKeyError, NoContentError
 from domain.models import Chats, ChatsDTO
 
 from infrastructure.repository.abstractions import AbstractRepository
@@ -10,14 +10,14 @@ from mapper import map_chats_dto_to_dao
 
 
 class ChatsRepository(AbstractRepository):
-    def __init__(self, context):
-        self._context = context
+    def __init__(self, session):
+        self._session = session
 
     async def create(self, entity: ChatsDTO):
         try:
             mapped_entity = map_chats_dto_to_dao(entity)
-            self._context.get_session.add(mapped_entity)
-            await self._context.get_session.flush()
+            self._session.add(mapped_entity)
+            await self._session.flush()
 
             return mapped_entity
         except IntegrityError as e:
@@ -32,14 +32,17 @@ class ChatsRepository(AbstractRepository):
 
     async def get_by_id(self, id: int):
         try:
-            return await self._context.get_session.get(Chats, id)
+            chat = await self._session.get(Chats, id)
+            if chat:
+                return chat
+            raise NoContentError(f"No chat found with id: {id}")
         except Exception as e:
             print(f"Error retrieving chat: {e}")
             raise e
 
     async def get_all(self):
         try:
-            result = await self._context.get_session.execute(select(Chats))
+            result = await self._session.execute(select(Chats))
             return result.all()
         except Exception as e:
             print(f"Error retrieving chats: {e}")
@@ -47,7 +50,7 @@ class ChatsRepository(AbstractRepository):
 
     async def update(self, entity: ChatsDTO):
         try:
-            return self._context.get_session.merge(map_chats_dto_to_dao(entity))
+            return self._session.merge(map_chats_dto_to_dao(entity))
         except DataError as e:
             print(f"Data error while updating chat: {e}")
             raise e
@@ -57,9 +60,9 @@ class ChatsRepository(AbstractRepository):
 
     async def delete(self, id: int):
         try:
-            chat = await self._context.get_session.get(Chats, id)
+            chat = await self._session.get(Chats, id)
             if chat:
-                await self._context.get_session.delete(chat)
+                await self._session.delete(chat)
                 return True
             raise DataError
         except Exception as e:
