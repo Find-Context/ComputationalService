@@ -2,14 +2,14 @@ from domain.models import MessageDTO, UsersDTO, ChatsDTO, Message, Users, Chats
 from core import MessageTypes
 
 
-def map_message_dto_to_dao(message_dto: MessageDTO) -> Message:
+def map_message_dto_to_dao(message_dto: MessageDTO, embedding: list) -> Message:
     message_type = message_dto.type
 
     message_dao = Message(
         chat_id=message_dto.chat_id,
         message_id=message_dto.message_id,
         type=message_type,
-        vector=message_dto.vector,
+        vector=embedding,
         text=message_dto.text,
         has_document=message_type == MessageTypes.DOCUMENT,
         has_audio=message_type == MessageTypes.AUDIO,
