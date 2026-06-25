@@ -9,6 +9,7 @@
 # https://github.com/docker/awesome-compose
 services:
   server:
+    container_name: alv_computational_service
     build:
       context: .
     dns:
