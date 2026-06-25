@@ -1,4 +1,4 @@
-from domain.models import ChatsDTO
+from core.dto import ChatsDTO
 
 from fastapi import APIRouter, status, Depends
 

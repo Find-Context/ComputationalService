@@ -1,12 +1,13 @@
 from pymongo.errors import DuplicateKeyError
 
 from core.exceptions import DuplicatedPrimaryKeyError
+from domain.models import Message
 from domain.models.mongo import ContextMessageDao
-from domain.models import Message, MessageDTO
+from core.dto import MessageDTO
 
 from infrastructure.repository.abstractions import AbstractRepository
 
-from mapper import map_message_dto_to_dao
+from core.mapper import map_message_dto_to_dao
 
 from sentence_transformers import SentenceTransformer
 

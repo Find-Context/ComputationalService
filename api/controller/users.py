@@ -1,4 +1,4 @@
-from domain.models import UsersDTO
+from core.dto import UsersDTO
 
 from fastapi import APIRouter, status, Depends
 

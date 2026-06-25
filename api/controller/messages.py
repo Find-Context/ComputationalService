@@ -1,4 +1,4 @@
-from domain.models import MessageDTO
+from core.dto import MessageDTO
 
 from fastapi import APIRouter, status, Depends
 

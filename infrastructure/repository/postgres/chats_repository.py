@@ -2,11 +2,12 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, DataError
 
 from core.exceptions import DuplicatedPrimaryKeyError, NoContentError
-from domain.models import Chats, ChatsDTO
+from domain.models import Chats
+from core.dto import ChatsDTO
 
 from infrastructure.repository.abstractions import AbstractRepository
 
-from mapper import map_chats_dto_to_dao
+from core.mapper import map_chats_dto_to_dao
 
 
 class ChatsRepository(AbstractRepository):
