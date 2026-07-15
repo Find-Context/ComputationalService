@@ -1,4 +1,4 @@
-from domain import UsersService, ChatsService, UsersChatsService, MessageService
+from core.services import UsersService, ChatsService, UsersChatsService, MessageService
 from infrastructure.repository import UsersRepository, ChatsRepository, UsersChatsRepository, MessageRepository
 from infrastructure.repository.context import _postgres_context, _mongo_context
 

@@ -3,11 +3,12 @@ from sqlalchemy.exc import IntegrityError, DataError
 
 from core.exceptions import NoContentError
 from core.exceptions.entity_error import DuplicatedPrimaryKeyError
-from domain.models import Users, UsersDTO
+from domain.models import Users
+from core.dto import UsersDTO
 
 from infrastructure.repository.abstractions import AbstractRepository
 
-from mapper import map_users_dto_to_dao
+from core.mapper import map_users_dto_to_dao
 
 
 class UsersRepository(AbstractRepository):

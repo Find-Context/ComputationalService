@@ -1,0 +1,11 @@
+fastapi
+numpy
+pydantic
+pydantic_settings
+pymongo
+scikit_learn
+sentence_transformers
+SQLAlchemy
+starlette
+uvicorn
+asyncpg

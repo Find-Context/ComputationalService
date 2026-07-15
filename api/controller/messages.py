@@ -1,4 +1,4 @@
-from domain.models import MessageDTO
+from core.dto import MessageDTO
 
 from fastapi import APIRouter, status, Depends
 
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/messages", tags=["messages"])
 
 @router.post("/insert", status_code=status.HTTP_201_CREATED)
 async def insert_message(message: MessageDTO, service=Depends(get_message_service)):
-    await service.create_message(message)
+    return await service.create_message(message)
 
 
 @router.post("/fast_search", status_code=status.HTTP_200_OK)
