@@ -9,7 +9,7 @@
 # https://github.com/docker/awesome-compose
 services:
   server:
-    container_name: alv_computational_service
+    container_name: comp_service_alvares
     build:
       context: .
     dns:
@@ -19,6 +19,32 @@ services:
       - 1000:1000
     volumes:
       - ./database:/data
+  postgres:
+    image: postgres:latest
+    container_name: postgres_alvares
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - /alvares/database/postgres:/var/lib/postgresql
+      - ./scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongo:
+    image: mongo:6
+    container_name: mongo_alvares
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - /alvares/database/mongodb:/data/db
+      - ./scripts/mongo/init.js:/docker-entrypoint-initdb.d/init.js
+networks:
+  default:
+    name: find-context
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
