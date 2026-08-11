@@ -44,14 +44,14 @@ class ChatsRepository(AbstractRepository):
     async def get_all(self):
         try:
             result = await self._session.execute(select(Chats))
-            return result.all()
+            return result.scalars().all()
         except Exception as e:
             print(f"Error retrieving chats: {e}")
             raise e
 
     async def update(self, entity: ChatsDTO):
         try:
-            return self._session.merge(map_chats_dto_to_dao(entity))
+            return await self._session.merge(map_chats_dto_to_dao(entity))
         except DataError as e:
             print(f"Data error while updating chat: {e}")
             raise e
@@ -65,7 +65,9 @@ class ChatsRepository(AbstractRepository):
             if chat:
                 await self._session.delete(chat)
                 return True
-            raise DataError
+            raise NoContentError(f"No chat found with id: {id}")
+        except NoContentError:
+            raise
         except Exception as e:
             print(f"Error deleting chat: {e}")
             raise e

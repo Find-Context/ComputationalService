@@ -45,14 +45,14 @@ class UsersRepository(AbstractRepository):
     async def get_all(self):
         try:
             result = await self._session.execute(select(Users))
-            return result.all()
+            return result.scalars().all()
         except Exception as e:
             print(f"Error retrieving users: {e}")
             raise e
 
     async def update(self, entity: UsersDTO):
         try:
-            return self._session.merge(map_users_dto_to_dao(entity))
+            return await self._session.merge(map_users_dto_to_dao(entity))
         except DataError as e:
             print(f"Data error while updating user: {e}")
             raise e
@@ -66,7 +66,9 @@ class UsersRepository(AbstractRepository):
             if user:
                 await self._session.delete(user)
                 return True
-            raise DataError
+            raise NoContentError(f"No user found with id: {id}")
+        except NoContentError:
+            raise
         except Exception as e:
             print(f"Error deleting user: {e}")
             raise e

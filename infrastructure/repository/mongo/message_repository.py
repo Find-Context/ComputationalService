@@ -1,7 +1,6 @@
 from pymongo.errors import DuplicateKeyError
 
-from core.exceptions import DuplicatedPrimaryKeyError
-from domain.models import Message
+from core.exceptions import DuplicatedPrimaryKeyError, NoContentError
 from domain.models.mongo import ContextMessageDao
 from core.dto import MessageDTO
 
@@ -30,11 +29,28 @@ class MessageRepository(AbstractRepository):
             print(f"Error inserting message: {e}")
             raise e
 
-    async def get_by_id(self, id: int):
+    async def get_by_id(self, message_id: int):
         try:
-            return await self._context.get_database.get_collection("messages").find_one({"id": id})
+            message = await self._context.get_database.get_collection("messages").find_one(
+                {"message_id": message_id}
+            )
+            if message:
+                return message
+            raise NoContentError(f"No message found with message_id: {message_id}")
+        except NoContentError:
+            raise
         except Exception as e:
             print(f"Error getting message: {e}")
+            raise e
+
+    async def get_all_by_chat_id(self, chat_id: int):
+        try:
+            cursor = self._context.get_database.get_collection("messages").find(
+                {"chat_id": chat_id}
+            ).sort("created_at", -1)
+            return await cursor.to_list(length=None)
+        except Exception as e:
+            print(f"Error getting messages by chat id: {e}")
             raise e
 
     async def fast_search(self, context_message: ContextMessageDao):
@@ -91,14 +107,38 @@ class MessageRepository(AbstractRepository):
             raise e
 
     async def get_all(self):
-        pass
-
-    async def update(self, entity: Message):  # TODO: implement update method
-        pass
-
-    async def delete(self, id: int):
         try:
-            result = await self._context.get_database.get_collection("messages").delete_one({"_id": id})
+            cursor = self._context.get_database.get_collection("messages").find({})
+            return await cursor.to_list(length=None)
+        except Exception as e:
+            print(f"Error getting all messages: {e}")
+            raise e
+
+    async def update(self, entity: MessageDTO):
+        try:
+            embedding = _model.encode([entity.text]).tolist()[0]
+            message_dao = map_message_dto_to_dao(entity, embedding)
+
+            result = await self._context.get_database.get_collection("messages").update_one(
+                {"chat_id": entity.chat_id, "message_id": entity.message_id},
+                {"$set": message_dao.model_dump(mode='json')},
+            )
+            if result.matched_count == 0:
+                raise NoContentError(
+                    f"No message found with chat_id: {entity.chat_id}, message_id: {entity.message_id}"
+                )
+            return result.modified_count > 0
+        except NoContentError:
+            raise
+        except Exception as e:
+            print(f"Error updating message: {e}")
+            raise e
+
+    async def delete(self, message_id: int):
+        try:
+            result = await self._context.get_database.get_collection("messages").delete_one(
+                {"message_id": message_id}
+            )
             return result.deleted_count > 0
         except Exception as e:
             print(f"Error deleting message: {e}")

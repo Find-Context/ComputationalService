@@ -19,8 +19,14 @@ class MessageService:
     async def get_message_by_id(self, message_id):
         return await self._repository.get_by_id(message_id)
 
+    async def update_message(self, message_dto: MessageDTO):
+        return await self._repository.update(message_dto)
+
     async def delete_message(self, message_id):
         return await self._repository.delete(message_id)
+
+    async def get_all_messages_by_chat(self, chat_id: int):
+        return await self._repository.get_all_by_chat_id(chat_id)
 
     async def fast_search(self, message_dto: MessageDTO):
         context_message = ContextMessageDao(

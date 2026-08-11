@@ -1,5 +1,11 @@
 from core.services import UsersService, ChatsService, UsersChatsService, MessageService
-from infrastructure.repository import UsersRepository, ChatsRepository, UsersChatsRepository, MessageRepository
+from infrastructure.repository import (
+    UsersRepository,
+    ChatsRepository,
+    UsersChatsRepository,
+    MessageRepository,
+    HybridRepository,
+)
 from infrastructure.repository.context import _postgres_context, _mongo_context
 
 
@@ -49,3 +55,14 @@ async def get_message_service():
     except Exception as e:
         print(f"Error in message service dependency: {e}")
         raise e
+
+
+async def get_hybrid_repository():
+    async with _postgres_context.get_session as session:
+        try:
+            yield HybridRepository(session, _mongo_context)
+            await session.commit()
+        except Exception as e:
+            print(f"Error in hybrid repository dependency: {e}")
+            await session.rollback()
+            raise e
