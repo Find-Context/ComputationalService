@@ -57,11 +57,6 @@ class MessageRepository(AbstractRepository):
         try:
             pipeline = [
                 {
-                    "$match": {
-                        "chat_id": context_message.chat_id
-                    }
-                },
-                {
                     "$addFields": {
                         "similarity": {
                             "$reduce": {
