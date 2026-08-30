@@ -95,7 +95,8 @@ class MessageRepository(AbstractRepository):
             result = await aggregated.to_list(length=1)
             if not result:
                 return None
-            return result[0].get("message_id") + result[0].get("chat_id") + result[0].get("text")
+            print(result[0].get("chat_id") +" " + result[0].get("text"))
+            return result[0].get("message_id")
 
         except Exception as e:
             print(f"Error performing fast search: {e}")
